@@ -17,7 +17,7 @@ app.use('/api/experiencias', experienciaRoutes);
 const PORT = process.env.PORT || 3000;
 
 sequelize
-  .sync()
+  .sync({ alter: true })
   .then(() => {
     console.log('Banco de dados sincronizado.');
     app.listen(PORT, () => {

@@ -4,8 +4,8 @@ const Habilidade = require('./habilidade');
 const Experiencia = require('./experiencia');
 
 // Definindo relações
-Curriculo.hasMany(Habilidade, { foreignKey: 'curriculoId' });
-Curriculo.hasMany(Experiencia, { foreignKey: 'curriculoId' });
+Curriculo.hasMany(Habilidade, { foreignKey: 'curriculoId',onDelete: 'CASCADE', });
+Curriculo.hasMany(Experiencia, { foreignKey: 'curriculoId' ,onDelete: 'CASCADE',});
 Habilidade.belongsTo(Curriculo, { foreignKey: 'curriculoId' });
 Experiencia.belongsTo(Curriculo, { foreignKey: 'curriculoId' });
 
