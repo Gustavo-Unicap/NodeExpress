@@ -93,35 +93,60 @@ const createCurriculoFull = async (req, res) => {
   }
 };
 
-const updateCurriculoFull = async (req, res) => {
-  const { nome, descricao, habilidades, experiencias } = req.body;
+const c = async (req, res) => {
+  const { nome, descricao, Habilidades, Experiencias } = req.body;
 
   try {
-    // Atualizando o currículo
-    const curriculo = await Curriculo.update(
+    // Atualizando o Currículo
+    const [updatedRows] = await Curriculo.update(
       { nome, descricao },
-      { where: { id: req.params.id }, returning: true }
+      { where: { id: req.params.id } }
     );
 
-    // Verificando se o currículo foi encontrado
-    if (!curriculo[0]) {
+    // Verificando se o currículo foi encontrado e/ou atualizado
+    if (updatedRows === 0) {
       return res.status(404).json({ error: 'Currículo não encontrado' });
     }
 
-    // Excluindo as habilidades antigas
-    if (habilidades) {
-      await Habilidade.destroy({ where: { curriculoId: req.params.id } });
-
-      // Criando as novas habilidades
-      await Habilidade.bulkCreate(habilidades.map(h => ({ ...h, curriculoId: req.params.id })));
+    // Atualizando ou criando as habilidades
+    if (Habilidades && Habilidades.length > 0) {
+      for (const habilidade of Habilidades) {
+        if (habilidade.id) {
+          // Se o ID da habilidade existe, atualiza
+          await Habilidade.update(
+            { titulo: habilidade.titulo, nivel: habilidade.nivel },
+            { where: { id: habilidade.id } }
+          );
+        } else {
+          // Caso contrário, cria
+          await Habilidade.create({ 
+            titulo: habilidade.titulo, 
+            nivel: habilidade.nivel, 
+            curriculoId: req.params.id 
+          });
+        }
+      }
     }
 
-    // Excluindo as experiências antigas
-    if (experiencias) {
-      await Experiencia.destroy({ where: { curriculoId: req.params.id } });
-
-      // Criando as novas experiências
-      await Experiencia.bulkCreate(experiencias.map(e => ({ ...e, curriculoId: req.params.id })));
+    // Atualizando ou criando as experiências
+    if (Experiencias && Experiencias.length > 0) {
+      for (const experiencia of Experiencias) {
+        if (experiencia.id) {
+          // Se o ID da experiência existe, atualiza
+          await Experiencia.update(
+            { titulo: experiencia.titulo, empresa: experiencia.empresa, duracao: experiencia.duracao },
+            { where: { id: experiencia.id } }
+          );
+        } else {
+          // Caso contrário, cria
+          await Experiencia.create({
+            titulo: experiencia.titulo,
+            empresa: experiencia.empresa,
+            duracao: experiencia.duracao,
+            curriculoId: req.params.id
+          });
+        }
+      }
     }
 
     // Buscando o currículo atualizado com as suas habilidades e experiências
