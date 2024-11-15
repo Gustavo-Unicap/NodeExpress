@@ -61,10 +61,35 @@ const deleteCurriculo = async (req, res) => {
   }
 };
 
+// Criar um currículo com habilidades e experiências
+const createCurriculoFull = async (req, res) => {
+  const { nome, descricao, habilidades, experiencias } = req.body;
+
+  try {
+    const curriculo = await Curriculo.create(
+      {
+        nome,
+        descricao,
+        Habilidades: habilidades,
+        Experiencias: experiencias,
+      },
+      {
+        include: [Habilidade, Experiencia], // Incluir relacionamentos na criação
+      }
+    );
+    res.status(201).json(curriculo);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Erro ao criar currículo com relações.' });
+  }
+};
+
+
 module.exports = {
   createCurriculo,
   getCurriculos,
   getCurriculoById,
   updateCurriculo,
   deleteCurriculo,
+  createCurriculoFull
 };

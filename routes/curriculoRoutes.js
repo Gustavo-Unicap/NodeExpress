@@ -1,15 +1,16 @@
 const express = require('express');
 const {
-  createCurriculo,
+  //createCurriculo,
   getCurriculos,
   getCurriculoById,
   updateCurriculo,
   deleteCurriculo,
+  createCurriculoFull,
 } = require('../controllers/curriculoController');
 
 const router = express.Router();
 
-router.post('/', createCurriculo);
+router.post('/', createCurriculoFull);
 router.get('/', getCurriculos);
 router.get('/:id', getCurriculoById);
 router.put('/:id', updateCurriculo);
