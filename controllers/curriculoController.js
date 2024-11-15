@@ -71,7 +71,7 @@ const createCurriculoFull = async (req, res) => {
         nome,
         descricao,
         Habilidades: habilidades,
-        Experiencias: experiencias,
+        Experiencia: experiencias,
       },
       {
         include: [Habilidade, Experiencia], // Incluir relacionamentos na criação
