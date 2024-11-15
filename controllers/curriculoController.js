@@ -14,7 +14,10 @@ const createCurriculo = async (req, res) => {
 const getCurriculos = async (req, res) => {
   try {
     const curriculos = await Curriculo.findAll({
-      include: [Habilidade, Experiencia],
+      include: [
+        { model: Habilidade, as: 'Habilidades' }, // Alias correto
+        { model: Experiencia, as: 'Experiencias' }, // Alias correto
+      ],
     });
     res.json(curriculos);
   } catch (error) {
