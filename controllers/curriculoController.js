@@ -93,7 +93,7 @@ const createCurriculoFull = async (req, res) => {
   }
 };
 
-const c = async (req, res) => {
+const updateCurriculoFull = async (req, res) => {
   const { nome, descricao, Habilidades, Experiencias } = req.body;
 
   try {
@@ -173,5 +173,5 @@ module.exports = {
   updateCurriculo,
   deleteCurriculo,
   createCurriculoFull,
-  updateCurriculoFull,
+  updateCurriculoFull
 };
