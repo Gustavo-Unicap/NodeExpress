@@ -74,7 +74,10 @@ const createCurriculoFull = async (req, res) => {
         Experiencias: experiencias,
       },
       {
-        include: [Habilidade, Experiencia], // Incluir relacionamentos na criação
+        include: [
+          { model: Habilidade, as: 'Habilidades' },
+          { model: Experiencia, as: 'Experiencias' },
+        ],
       }
     );
     res.status(201).json(curriculo);
