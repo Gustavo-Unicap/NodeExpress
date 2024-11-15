@@ -15,8 +15,8 @@ const getCurriculos = async (req, res) => {
   try {
     const curriculos = await Curriculo.findAll({
       include: [
-        { model: Habilidade, as: 'Habilidades' }, // Alias correto
-        { model: Experiencia, as: 'Experiencias' }, // Alias correto
+        { model: Habilidade, as: 'Habilidades' },
+        { model: Experiencia, as: 'Experiencias' },
       ],
     });
     res.json(curriculos);
@@ -30,7 +30,10 @@ const getCurriculoById = async (req, res) => {
   try {
     const { id } = req.params;
     const curriculo = await Curriculo.findByPk(id, {
-      include: [Habilidade, Experiencia],
+      include: [
+        { model: Habilidade, as: 'Habilidades' },
+        { model: Experiencia, as: 'Experiencias' }, 
+      ],
     });
     if (!curriculo) return res.status(404).json({ error: 'Currículo não encontrado.' });
     res.json(curriculo);
@@ -90,6 +93,53 @@ const createCurriculoFull = async (req, res) => {
   }
 };
 
+const updateCurriculoFull = async (req, res) => {
+  const { nome, descricao, habilidades, experiencias } = req.body;
+
+  try {
+    // Atualizando o currículo
+    const curriculo = await Curriculo.update(
+      { nome, descricao },
+      { where: { id: req.params.id }, returning: true }
+    );
+
+    // Verificando se o currículo foi encontrado
+    if (!curriculo[0]) {
+      return res.status(404).json({ error: 'Currículo não encontrado' });
+    }
+
+    // Excluindo as habilidades antigas
+    if (habilidades) {
+      await Habilidade.destroy({ where: { curriculoId: req.params.id } });
+
+      // Criando as novas habilidades
+      await Habilidade.bulkCreate(habilidades.map(h => ({ ...h, curriculoId: req.params.id })));
+    }
+
+    // Excluindo as experiências antigas
+    if (experiencias) {
+      await Experiencia.destroy({ where: { curriculoId: req.params.id } });
+
+      // Criando as novas experiências
+      await Experiencia.bulkCreate(experiencias.map(e => ({ ...e, curriculoId: req.params.id })));
+    }
+
+    // Buscando o currículo atualizado com as suas habilidades e experiências
+    const updatedCurriculo = await Curriculo.findOne({
+      where: { id: req.params.id },
+      include: [
+        { model: Habilidade, as: 'Habilidades' },
+        { model: Experiencia, as: 'Experiencias' }
+      ]
+    });
+
+    // Retornando o currículo atualizado
+    res.status(200).json(updatedCurriculo);
+  } catch (error) {
+    console.error('Erro ao atualizar currículo:', error);
+    res.status(500).json({ error: 'Erro ao atualizar currículo com relações.' });
+  }
+};
 
 module.exports = {
   createCurriculo,
@@ -97,5 +147,6 @@ module.exports = {
   getCurriculoById,
   updateCurriculo,
   deleteCurriculo,
-  createCurriculoFull
+  createCurriculoFull,
+  updateCurriculoFull,
 };
